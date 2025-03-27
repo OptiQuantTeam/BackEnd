@@ -106,7 +106,7 @@ jobs:
               "httpMethod": "GET",
               "path": "/optiquant/test",
               "headers": {
-                "x-api-key": \"${{ secrets.X_API_KEY }}\"
+                "x-api-key": "${{ secrets.X_API_KEY }}"
               }
             }' \
             --cli-binary-format raw-in-base64-out \
