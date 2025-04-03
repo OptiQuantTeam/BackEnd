@@ -53,7 +53,7 @@ async function getContractList(api_key, secret_key){
   // 7일 단위로 나누어 조회 (밀리초 단위)
   const interval = 7 * 24 * 60 * 60 * 1000;
   let currentStartTime = startTime;
-  
+  const limit = 1000; // 바이낸스 API 기본 제한
   // 요청 간 지연 시간 (밀리초)
   const delayBetweenRequests = 1000; // 1초
   
@@ -64,7 +64,7 @@ async function getContractList(api_key, secret_key){
     console.log(`Fetching data from ${new Date(currentStartTime).toISOString()} to ${new Date(currentEndTime).toISOString()}`);
     
     const timestamp = Date.now();
-    const queryString = `timestamp=${timestamp}&startTime=${currentStartTime}&endTime=${currentEndTime}`;
+    const queryString = `timestamp=${timestamp}&startTime=${currentStartTime}&endTime=${currentEndTime}&limit=${limit}`;
     const signature = crypto
       .createHmac('sha256', secret_key)
       .update(queryString)
@@ -75,6 +75,7 @@ async function getContractList(api_key, secret_key){
         timestamp: timestamp,
         startTime: currentStartTime,
         endTime: currentEndTime,
+        limit: limit,
         signature: signature
       },
       headers: {
