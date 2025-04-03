@@ -52,7 +52,8 @@ async function getContractList(api_key, secret_key){
   const limit = 1000; // 바이낸스 API 기본 제한
   
   while (currentStartTime < endTime) {
-    const queryString = `timestamp=${Date.now()}&startTime=${currentStartTime}&endTime=${endTime}&limit=${limit}`;
+    const timestamp = Date.now();
+    const queryString = `timestamp=${timestamp}&startTime=${currentStartTime}&endTime=${endTime}&limit=${limit}`;
     const signature = crypto
       .createHmac('sha256', secret_key)
       .update(queryString)
@@ -60,7 +61,7 @@ async function getContractList(api_key, secret_key){
 
     const params = {
       params: {
-        timestamp: Date.now(),
+        timestamp: timestamp,
         startTime: currentStartTime,
         endTime: endTime,
         limit: limit,
@@ -110,7 +111,8 @@ async function getIncome(api_key, secret_key){
   const limit = 1000; // 바이낸스 API 기본 제한
   
   while (currentStartTime < endTime) {
-    const queryString = `timestamp=${Date.now()}&startTime=${currentStartTime}&endTime=${endTime}&limit=${limit}`;
+    const timestamp = Date.now();
+    const queryString = `timestamp=${timestamp}&startTime=${currentStartTime}&endTime=${endTime}&limit=${limit}`;
     const signature = crypto
       .createHmac('sha256', secret_key)
       .update(queryString)
@@ -118,7 +120,7 @@ async function getIncome(api_key, secret_key){
 
     const params = {
       params: {
-        timestamp: Date.now(),
+        timestamp: timestamp,
         startTime: currentStartTime,
         endTime: endTime,
         limit: limit,
