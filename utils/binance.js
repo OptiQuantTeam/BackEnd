@@ -55,7 +55,7 @@ async function getContractList(api_key, secret_key){
   let currentStartTime = startTime;
   const limit = 1000; // 바이낸스 API 기본 제한
   // 요청 간 지연 시간 (밀리초)
-  const delayBetweenRequests = 1000; // 1초
+  const delayBetweenRequests = 100; // 1초
   
   while (currentStartTime < endTime) {
     // 현재 시작 시간에서 7일 후 또는 종료 시간 중 더 작은 값을 현재 종료 시간으로 설정
