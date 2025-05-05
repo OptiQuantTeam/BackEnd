@@ -19,8 +19,7 @@ exports.handler = async (event) => {
 
   switch(true){
     case event.httpMethod === 'GET' && event.path === rootPath:
-      const homeBody = JSON.parse(event.body)
-      response = await s3Service.getJsonFile(homeBody);
+      response = await s3Service.getJsonFile();
       break;
     case event.httpMethod === 'GET' && event.path === testPath:
       response = util.buildResponse(200);

@@ -5,10 +5,8 @@ const s3 = new AWS.S3();
 const bucketName = 'optiquant-ai-metadata';
 const key = '*.json';
 
-exports.getJsonFile = async (requestBody) => {
+exports.getJsonFile = async () => {
   try {
-    const bucketName = requestBody.bucketName;
-    const key = requestBody.key;
     const params = {
       Bucket: bucketName,
       Key: key
