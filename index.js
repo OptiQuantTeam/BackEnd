@@ -2,6 +2,7 @@ const registerService = require('./service/register')
 const loginService = require('./service/login')
 const verifyService =require('./service/verify')
 const contentService = require('./service/content')
+const s3Service = require('./service/s3')
 const util = require('./utils/util')
 
 const registerPath = '/register';
@@ -9,6 +10,7 @@ const loginPath = '/login';
 const verifyPath = '/verify';
 const testPath = '/test';
 const contentPath = '/content';
+const rootPath = '/';
 
 
 exports.handler = async (event) => {
@@ -16,6 +18,10 @@ exports.handler = async (event) => {
   let response;
 
   switch(true){
+    case event.httpMethod === 'GET' && event.path === rootPath:
+      const homeBody = JSON.parse(event.body)
+      response = await s3Service.getJsonFile(homeBody);
+      break;
     case event.httpMethod === 'GET' && event.path === testPath:
       response = util.buildResponse(200);
       break;
