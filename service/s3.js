@@ -3,7 +3,7 @@ const util = require('../utils/util');
 
 const s3 = new AWS.S3();
 const bucketName = 'optiquant-ai-metadata';
-const key = '*.json';
+const key = 'NEW_ALGO9_metadata_20250505_15:00:29.json';
 
 exports.getJsonFile = async () => {
   try {
