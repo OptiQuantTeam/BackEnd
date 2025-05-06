@@ -36,7 +36,7 @@ async function content(requestBody){
           message: 'API KEY and SECRET KEY Not Found.'
         })
       }
-      const contractData = await binance.getContractList(dynamoUser.api_key, dynamoUser.secret_key);
+      const contractData = await binance.getContractList(dynamoUser.api_key, dynamoUser.secret_key, requestBody.timestamp);
       response = {
         data : contractData
       }
@@ -47,7 +47,7 @@ async function content(requestBody){
           message: 'API KEY and SECRET KEY Not Found.'
         })
       }
-      const incomeData = await binance.getIncome(dynamoUser.api_key, dynamoUser.secret_key);
+      const incomeData = await binance.getIncome(dynamoUser.api_key, dynamoUser.secret_key, requestBody.timestamp);
       response = {
         data : incomeData
       };
