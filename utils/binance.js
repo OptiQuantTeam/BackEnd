@@ -39,17 +39,17 @@ async function getBinance(api_key, secret_key) {
 }
 
 
-async function getContractList(api_key, secret_key, timestamp){
+async function getContractList(api_key, secret_key, time){
   const BASE_URL = 'https://fapi.binance.com';
 
-  // timestamp가 주어지면 해당 월의 시작과 끝 시간을 계산
+  // time이 주어지면 해당 월의 시작과 끝 시간을 계산
   let startTime, endTime;
-  if (timestamp) {
-    const date = new Date(timestamp);
+  if (time) {
+    const date = new Date(time);
     startTime = new Date(date.getFullYear(), date.getMonth(), 1).getTime(); // 해당 월의 1일
     endTime = new Date(date.getFullYear(), date.getMonth() + 1, 0).getTime(); // 해당 월의 마지막 날
   } else {
-    // timestamp가 주어지지 않으면 현재 월의 데이터를 가져옴
+    // time이 주어지지 않으면 현재 월의 데이터를 가져옴
     const now = new Date();
     startTime = new Date(now.getFullYear(), now.getMonth(), 1).getTime(); // 현재 월의 1일
     endTime = new Date(now.getFullYear(), now.getMonth() + 1, 0).getTime(); // 현재 월의 마지막 날
@@ -59,11 +59,14 @@ async function getContractList(api_key, secret_key, timestamp){
   
   let allData = [];
   let currentStartTime = startTime;
-  const limit = 1000; // 바이낸스 API 기본 제한
+  const interval = 7 * 24 * 60 * 60 * 1000; // 7일을 밀리초로 변환
   
   while (currentStartTime < endTime) {
+    // 현재 시작 시간에서 7일 후 또는 종료 시간 중 더 작은 값을 현재 종료 시간으로 설정
+    const currentEndTime = Math.min(currentStartTime + interval, endTime);
+    
     const timestamp = Date.now();
-    const queryString = `timestamp=${timestamp}&startTime=${currentStartTime}&endTime=${endTime}&limit=${limit}`;
+    const queryString = `timestamp=${timestamp}&startTime=${currentStartTime}&endTime=${currentEndTime}`;
     const signature = crypto
       .createHmac('sha256', secret_key)
       .update(queryString)
@@ -73,8 +76,7 @@ async function getContractList(api_key, secret_key, timestamp){
       params: {
         timestamp: timestamp,
         startTime: currentStartTime,
-        endTime: endTime,
-        limit: limit,
+        endTime: currentEndTime,
         signature: signature
       },
       headers: {
@@ -86,19 +88,16 @@ async function getContractList(api_key, secret_key, timestamp){
       const response = await axios.get(BASE_URL+endpoint, params);
       const data = response.data;
       
-      if (data.length === 0) {
-        break; // 더 이상 데이터가 없으면 종료
+      if (data.length > 0) {
+        allData = [...allData, ...data];
       }
       
-      allData = [...allData, ...data];
+      // 다음 7일 간격으로 이동
+      currentStartTime = currentEndTime;
       
-      // 마지막으로 받은 데이터의 시간 + 1ms를 다음 시작점으로 설정
-      if (data.length < limit) {
-        break; // 마지막 페이지라면 종료
-      } else {
-        // 받은 마지막 데이터의 시간을 기준으로 다음 요청의 시작 시간 설정
-        const lastTimestamp = data[data.length - 1].time;
-        currentStartTime = lastTimestamp + 1;
+      // 마지막 간격이면 종료
+      if (currentStartTime >= endTime) {
+        break;
       }
     } catch (error) {
       console.error('Error fetching contract list:', error.response ? error.response.data : error.message);
@@ -110,13 +109,13 @@ async function getContractList(api_key, secret_key, timestamp){
   return allData;
 }
 
-async function getIncome(api_key, secret_key, timestamp){
+async function getIncome(api_key, secret_key, time){
   const BASE_URL = 'https://fapi.binance.com';
   
   // time이 주어지면 해당 timestamp의 월의 시작과 끝 시간을 계산
   let startTime, endTime;
-  if (timestamp) {
-    const date = new Date(timestamp);
+  if (time) {
+    const date = new Date(time);
     startTime = new Date(date.getFullYear(), date.getMonth(), 1).getTime(); // 해당 월의 1일
     endTime = new Date(date.getFullYear(), date.getMonth() + 1, 0).getTime(); // 해당 월의 마지막 날
   } else {
