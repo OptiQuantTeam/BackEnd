@@ -42,6 +42,6 @@ exports.getJsonFile = async () => {
     return util.buildResponse(200, jsonContent);
   } catch (error) {
     console.error('Error reading S3 file:', error);
-    return util.buildResponse(500, { message: 'Error reading file from S3' });
+    return util.buildResponse(500, { message: 'Error reading file from S3', error: error });
   }
 }; 
