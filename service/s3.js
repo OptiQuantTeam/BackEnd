@@ -8,8 +8,7 @@ exports.getJsonFile = async () => {
   try {
     // 버킷의 모든 객체 목록 가져오기
     const listParams = {
-      Bucket: bucketName,
-      Prefix: '_metadata_' // metadata가 포함된 파일만 필터링
+      Bucket: bucketName
     };
 
     const listedObjects = await s3.listObjectsV2(listParams).promise();
@@ -18,8 +17,17 @@ exports.getJsonFile = async () => {
       return util.buildResponse(404, { message: 'No files found' });
     }
 
+    // metadata가 포함된 파일만 필터링
+    const metadataFiles = listedObjects.Contents.filter(file => 
+      file.Key.includes('_metadata_')
+    );
+
+    if (metadataFiles.length === 0) {
+      return util.buildResponse(404, { message: 'No metadata files found' });
+    }
+
     // 파일들을 파일명의 시간 정보를 기준으로 정렬
-    const sortedFiles = listedObjects.Contents.sort((a, b) => {
+    const sortedFiles = metadataFiles.sort((a, b) => {
       // 파일명에서 시간 정보 추출 (예: model_metadata_20240315_120000.json)
       const timeA = a.Key.split('_metadata_')[1].replace('.json', '');
       const timeB = b.Key.split('_metadata_')[1].replace('.json', '');
