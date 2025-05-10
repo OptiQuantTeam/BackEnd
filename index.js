@@ -10,7 +10,7 @@ const loginPath = '/login';
 const verifyPath = '/verify';
 const testPath = '/test';
 const contentPath = '/content';
-const rootPath = '/';
+const homePath = '/home';
 
 
 exports.handler = async (event) => {
@@ -18,11 +18,11 @@ exports.handler = async (event) => {
   let response;
 
   switch(true){
-    case event.httpMethod === 'GET' && event.path === rootPath:
-      response = await s3Service.getJsonFile();
-      break;
     case event.httpMethod === 'GET' && event.path === testPath:
       response = util.buildResponse(200);
+      break;
+    case event.httpMethod === 'GET' && event.path === homePath:
+      response = await s3Service.getJsonFile();
       break;
     case event.httpMethod === 'POST' && event.path === registerPath:
       const registerBody = JSON.parse(event.body)
