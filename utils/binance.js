@@ -46,14 +46,23 @@ async function getContractList(api_key, secret_key, time){
   let startTime, endTime;
   if (time) {
     const date = new Date(time);
+    const now = new Date();
     startTime = new Date(date.getFullYear(), date.getMonth(), 1).getTime(); // 해당 월의 1일
-    endTime = new Date(date.getFullYear(), date.getMonth() + 1, 0).getTime(); // 해당 월의 마지막 날
+    
+    // 현재 달인 경우 현재 시간까지, 아닌 경우 해당 월의 마지막 날까지
+    if (date.getFullYear() === now.getFullYear() && date.getMonth() === now.getMonth()) {
+      endTime = now.getTime();
+    } else {
+      endTime = new Date(date.getFullYear(), date.getMonth() + 1, 0).getTime(); // 해당 월의 마지막 날
+    }
   } else {
     // time이 주어지지 않으면 현재 월의 데이터를 가져옴
     const now = new Date();
     startTime = new Date(now.getFullYear(), now.getMonth(), 1).getTime(); // 현재 월의 1일
-    endTime = new Date(now.getFullYear(), now.getMonth() + 1, 0).getTime(); // 현재 월의 마지막 날
+    endTime = now.getTime(); // 현재 시간까지
   }
+
+  //console.log('Fetching data from:', new Date(startTime), 'to:', new Date(endTime));
 
   const endpoint = '/fapi/v1/userTrades';
   
