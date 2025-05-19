@@ -118,20 +118,14 @@ async function getContractList(api_key, secret_key, time){
   return allData;
 }
 
-async function getIncome(api_key, secret_key, time){
+async function getIncome(api_key, secret_key, startTime, endTime){
   const BASE_URL = 'https://fapi.binance.com';
   
-  // time이 주어지면 해당 timestamp의 월의 시작과 끝 시간을 계산
-  let startTime, endTime;
-  if (time) {
-    const date = new Date(time);
-    startTime = new Date(date.getFullYear(), date.getMonth(), 1).getTime(); // 해당 월의 1일
-    endTime = new Date(date.getFullYear(), date.getMonth() + 1, 0).getTime(); // 해당 월의 마지막 날
-  } else {
-    // time이 주어지지 않으면 현재 월의 데이터를 가져옴
+  // startTime과 endTime이 주어지지 않은 경우 현재 월의 데이터를 가져옴
+  if (!startTime || !endTime) {
     const now = new Date();
     startTime = new Date(now.getFullYear(), now.getMonth(), 1).getTime(); // 현재 월의 1일
-    endTime = new Date(now.getFullYear(), now.getMonth() + 1, 0).getTime(); // 현재 월의 마지막 날
+    endTime = now.getTime(); // 현재 시간까지
   }
 
   const endpoint = '/fapi/v1/income';
