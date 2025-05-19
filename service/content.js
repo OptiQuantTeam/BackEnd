@@ -47,7 +47,7 @@ async function content(requestBody){
           message: 'API KEY and SECRET KEY Not Found.'
         })
       }
-      const incomeData = await binance.getIncome(dynamoUser.api_key, dynamoUser.secret_key, requestBody.timestamp);
+      const incomeData = await binance.getIncome(dynamoUser.api_key, dynamoUser.secret_key, requestBody.startTime, requestBody.endTime);
       response = {
         data : incomeData
       };
