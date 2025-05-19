@@ -125,7 +125,7 @@ async function getIncome(api_key, secret_key, startTime, endTime){
   if (!startTime || !endTime) {
     const now = new Date();
     startTime = new Date(now.getFullYear(), now.getMonth(), 1).getTime(); // 현재 월의 1일
-    endTime = now.getTime(); // 현재 시간까지
+    endTime = new Date(now.getFullYear(), now.getMonth() + 1, 0).getTime(); // 현재 월의 마지막 날
   }
 
   const endpoint = '/fapi/v1/income';
@@ -133,10 +133,14 @@ async function getIncome(api_key, secret_key, startTime, endTime){
   let allData = [];
   let currentStartTime = startTime;
   const limit = 1000; // 바이낸스 API 기본 제한
+  const SEVEN_DAYS = 7 * 24 * 60 * 60 * 1000; // 7일을 밀리초로 변환
   
   while (currentStartTime < endTime) {
+    // 현재 시작 시간에서 7일 후 또는 종료 시간 중 더 작은 값을 현재 종료 시간으로 설정
+    const currentEndTime = Math.min(currentStartTime + SEVEN_DAYS, endTime);
+    
     const timestamp = Date.now();
-    const queryString = `timestamp=${timestamp}&startTime=${currentStartTime}&endTime=${endTime}&limit=${limit}`;
+    const queryString = `timestamp=${timestamp}&startTime=${currentStartTime}&endTime=${currentEndTime}&limit=${limit}`;
     const signature = crypto
       .createHmac('sha256', secret_key)
       .update(queryString)
@@ -146,7 +150,7 @@ async function getIncome(api_key, secret_key, startTime, endTime){
       params: {
         timestamp: timestamp,
         startTime: currentStartTime,
-        endTime: endTime,
+        endTime: currentEndTime,
         limit: limit,
         signature: signature
       },
@@ -159,19 +163,16 @@ async function getIncome(api_key, secret_key, startTime, endTime){
       const response = await axios.get(BASE_URL+endpoint, params);
       const data = response.data;
       
-      if (data.length === 0) {
-        break; // 더 이상 데이터가 없으면 종료
+      if (data.length > 0) {
+        allData = [...allData, ...data];
       }
       
-      allData = [...allData, ...data];
+      // 다음 7일 간격으로 이동
+      currentStartTime = currentEndTime;
       
-      // 마지막으로 받은 데이터의 시간 + 1ms를 다음 시작점으로 설정
-      if (data.length < limit) {
-        break; // 마지막 페이지라면 종료
-      } else {
-        // 받은 마지막 데이터의 시간을 기준으로 다음 요청의 시작 시간 설정
-        const lastTimestamp = data[data.length - 1].time;
-        currentStartTime = lastTimestamp + 1;
+      // 마지막 간격이면 종료
+      if (currentStartTime >= endTime) {
+        break;
       }
     } catch (error) {
       console.error('Error fetching income data:', error.response ? error.response.data : error.message);
